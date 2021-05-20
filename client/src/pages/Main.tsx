@@ -16,6 +16,11 @@ function Main() {
   return (
     <div>
       <h2>Main</h2>
+      <img
+        src={
+          "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1500&q=80"
+        }
+      />
       {data ? <Music data={data} /> : null}
       <button
         onClick={() => {

@@ -4,6 +4,8 @@ import cors from "cors";
 import { createConnection } from "typeorm";
 import "reflect-metadata";
 import dbconfig from "./config";
+import { userRouter, musicRouter } from "./route";
+import verification from "./utils/verification";
 
 const app: express.Application = express();
 const port: number = 4000;
@@ -23,7 +25,11 @@ app.use(
     credentials: true,
   })
 );
-app.use("/image", express.static("image"));
+
+app.use(verification);
+
+app.use("/user", userRouter);
+app.use("/music", musicRouter);
 
 app.get("/", (req, res) => {
   res.send("hello world");

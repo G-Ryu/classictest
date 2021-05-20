@@ -20,6 +20,9 @@ export class Music extends BaseEntity {
   track: string;
 
   @Column()
+  filePath: string;
+
+  @Column()
   album: string;
 
   @Column()
