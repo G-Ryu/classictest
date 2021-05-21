@@ -22,9 +22,9 @@ export = async (req, res) => {
     music.track = track;
     music.album = album;
     music.uploader = user;
-    music.filePath = req.file["filePath"][0].location;
+    music.filePath = req.files["filePath"][0].location;
     if (req.file["poster"]) {
-      music.poster = req.file["poster"][0].location;
+      music.poster = req.files["poster"][0].location;
     } else {
       music.poster =
         "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1500&q=80";

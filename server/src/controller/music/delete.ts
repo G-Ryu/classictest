@@ -1,5 +1,5 @@
 import { Music } from "../../entity/Music";
-import { getRepository } from "typeorm";
+import { getConnection } from "typeorm";
 
 export = async (req, res) => {
   const nickName = req.nickName;
@@ -11,12 +11,12 @@ export = async (req, res) => {
   }
 
   try {
-    const music = await getRepository(Music)
-      .createQueryBuilder("music")
-      .where("music.id = :id", { musicId })
-      .getOne();
-
-    await music.remove();
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(Music)
+      .where("id = :id", { id: musicId })
+      .execute();
 
     res.send({ message: "delete" });
   } catch (err) {
