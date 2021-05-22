@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
@@ -9,6 +10,17 @@ interface signUpProp {
 
 function Signup({ setIsSignUp }: signUpProp) {
   const dispatch = useDispatch();
+
+  const signupHandler = async () => {
+    const formTag = document.getElementById("formData") as HTMLFormElement;
+    const form = new FormData(formTag);
+
+    await axios({
+      url: `${process.env.REACT_APP_SERVER}/user/signup`,
+      method: "POST",
+      data: form,
+    });
+  };
 
   return (
     <Background
@@ -23,29 +35,39 @@ function Signup({ setIsSignUp }: signUpProp) {
       >
         <ModalContent>
           <h2>회원가입</h2>
-          <div>
-            <div>아이디</div>
-            <input></input>
-          </div>
-          <div>
-            <div>비밀번호</div>
-            <input></input>
-          </div>
-          <div>
-            <div>비밀번호 확인</div>
-            <input></input>
-          </div>
+          <form id="formData">
+            <div>
+              <div>아이디</div>
+              <input name="userId"></input>
+            </div>
+            <div>
+              <div>비밀번호</div>
+              <input name="password"></input>
+            </div>
+            <div>
+              <div>비밀번호 확인</div>
+              <input></input>
+            </div>
+            <div>
+              <div>프로필 사진</div>
+              <input
+                type="file"
+                name="profileImage"
+                className="profileImage"
+              ></input>
+            </div>
 
-          <div className="ttal">
-            <button>가입하기</button>
-            <button
-              onClick={() => {
-                setIsSignUp(false);
-              }}
-            >
-              뒤로가기
-            </button>
-          </div>
+            <div className="ttal">
+              <button onClick={signupHandler}>가입하기</button>
+              <button
+                onClick={() => {
+                  setIsSignUp(false);
+                }}
+              >
+                뒤로가기
+              </button>
+            </div>
+          </form>
         </ModalContent>
       </ModalWrapper>
     </Background>
@@ -71,7 +93,7 @@ const Background = styled.div`
 
 const ModalWrapper = styled.div`
   width: 350px;
-  height: 320px;
+  height: 350px;
   padding-top: 20px;
   background: #fff;
   color: #000;
@@ -86,11 +108,16 @@ const ModalContent = styled.div`
   width: 100%;
   height: 100%;
   flex-direction: column;
-  align-items: center;
+  text-align: center;
   color: #141414;
   overflow: auto;
   z-index: 5;
+  & .profileImage {
+    padding-top: 20px;
+  }
+  
   & .ttal {
+    padding-top: 20px;
     margin-top: auto;
     margin-bottom: auto;
 

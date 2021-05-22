@@ -7,7 +7,7 @@ import("dotenv/config");
 
 export = async (req, res) => {
   const { userId, password } = req.body;
-
+  console.log(req.body);
   try {
     const hashPW = crypto
       .createHmac("sha256", process.env.SHA_PW)

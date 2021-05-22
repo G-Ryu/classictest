@@ -29,8 +29,8 @@ function Mypage() {
           </div>
 
           <div className="ttal">
-            <button>회원가입</button>
-            <button>로그인</button>
+            <button>정보수정</button>
+            <button>회원탈퇴</button>
           </div>
         </ModalContent>
       </ModalWrapper>

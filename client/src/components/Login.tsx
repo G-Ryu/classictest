@@ -1,12 +1,37 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { setModalOpen } from "../actions";
+import { setModalOpen, setUserInfo } from "../actions";
 import Signup from "./Signup";
+import dotenv from "dotenv";
+dotenv.config();
 
 function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isErr, setIsErr] = useState(false);
   const dispatch = useDispatch();
+
+  const loginHandler = async () => {
+    const id = document.getElementById("loginID") as HTMLInputElement;
+    const pw = document.getElementById("loginPW") as HTMLInputElement;
+
+    await axios({
+      url: `${process.env.REACT_APP_SERVER}/user/login`,
+      method: "POST",
+      data: {
+        userId: id.value,
+        password: pw.value,
+      },
+    })
+      .then((res) => {
+        const userInfo = Object.assign({ isLogin: true }, res.data);
+        dispatch(setUserInfo(userInfo));
+      })
+      .catch(() => {
+        setIsErr(true);
+      });
+  };
 
   return isSignUp ? (
     <Signup setIsSignUp={setIsSignUp} />
@@ -25,11 +50,22 @@ function Login() {
           <h2>로그인</h2>
           <div>
             <div>아이디</div>
-            <input></input>
+            <input
+              id="loginID"
+              onFocus={() => {
+                setIsErr(false);
+              }}
+            />
           </div>
           <div>
             <div>비밀번호</div>
-            <input></input>
+            <input
+              type="password"
+              id="loginPW"
+              onFocus={() => {
+                setIsErr(false);
+              }}
+            />
           </div>
 
           <div className="ttal">
@@ -40,8 +76,9 @@ function Login() {
             >
               회원가입
             </button>
-            <button>로그인</button>
+            <button onClick={loginHandler}>로그인</button>
           </div>
+          {isErr ? <div>아이디와 비밀번호를 확인해주세요</div> : null}
         </ModalContent>
       </ModalWrapper>
     </Background>
