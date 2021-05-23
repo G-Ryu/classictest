@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { getConnection } from "typeorm";
 import { User } from "../../entity/User";
 import("dotenv/config");
 
@@ -11,12 +11,12 @@ export = async (req, res) => {
   }
 
   try {
-    const user = await getRepository(User)
-      .createQueryBuilder("user")
-      .where("user.nickName = :nickName", { nickName })
-      .getOne();
-
-    await user.remove();
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(User)
+      .where("nickName = :nickName", { nickName })
+      .execute();
 
     res
       .clearCookie("refreshToken", {

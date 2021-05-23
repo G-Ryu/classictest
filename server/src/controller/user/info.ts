@@ -19,7 +19,6 @@ export = async (req, res) => {
     res.send({
       data: {
         userId: user.userId,
-        userName: user.userName,
         nickName: user.nickName,
         profileImage: user.profileImage,
         upload: user.musics,

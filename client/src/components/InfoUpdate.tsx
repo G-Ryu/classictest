@@ -1,71 +1,72 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { setModalOpen, setUserInfo } from "../actions";
+import initialState from "../reducers/initialState";
+import { RootState } from "../store/index";
 
-interface signUpProp {
-  setIsSignUp: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-function Signup({ setIsSignUp }: signUpProp) {
+function InfoUpdate() {
   const dispatch = useDispatch();
   const [isSubmit, setIsSubmit] = useState(false);
-  const [isDuplId, setIsDuplId] = useState(false);
   const [isDuplNN, setIsDuplNN] = useState(false);
+  const [isSignout, setIsSignout] = useState(false);
 
-  const signupHandler = async () => {
+  const userInfo = useSelector(
+    (state: RootState) => state.userInfoReducer.userInfo
+  );
+
+  const updateHandler = async () => {
     const formTag = document.getElementById("formData") as HTMLFormElement;
     const form = new FormData(formTag);
 
     await axios({
-      url: `${process.env.REACT_APP_SERVER}/user/signup`,
+      url: `${process.env.REACT_APP_SERVER}/user/update`,
       method: "POST",
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userInfo.accessToken}`,
+      },
       data: form,
-    }).then(async () => {
-      const id = document.getElementById("userId") as HTMLInputElement;
-      const pw = document.getElementById("password") as HTMLInputElement;
+    }).then((res) => {
+      const nickName = res.data.data.nickName;
+      const profileImage = res.data.data.profileImage;
+      const cgIF = Object.assign({}, userInfo, { nickName, profileImage });
 
-      await axios({
-        url: `${process.env.REACT_APP_SERVER}/user/login`,
-        method: "POST",
-        data: {
-          userId: id.value,
-          password: pw.value,
-        },
-      }).then((res) => {
-        const userInfo = Object.assign({ isLogin: true }, res.data.data);
-        dispatch(setUserInfo(userInfo));
-      });
+      dispatch(setUserInfo(cgIF));
+      dispatch(setModalOpen(false));
     });
   };
 
-  const duplCheck = async (field: string) => {
-    const id = document.getElementById("userId") as HTMLInputElement;
+  const duplCheck = async () => {
     const nick = document.getElementById("nickName") as HTMLInputElement;
+    const value = nick.value;
 
-    const value = field === "userId" ? id.value : nick.value;
     await axios({
       url: `${process.env.REACT_APP_SERVER}/user/exist`,
       params: {
-        [field]: value,
+        nickName: value,
       },
     })
       .then(() => {
-        if (field === "userId") {
-          setIsDuplId(true);
-        } else {
-          setIsDuplNN(true);
-        }
+        setIsDuplNN(true);
       })
       .catch(() => {
-        if (field === "userId") {
-          setIsDuplId(false);
-        } else {
-          setIsDuplNN(false);
-        }
+        setIsDuplNN(false);
       });
+  };
+
+  const signoutHandler = async () => {
+    await axios({
+      url: `${process.env.REACT_APP_SERVER}/user/signout`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${userInfo.accessToken}`,
+      },
+    }).then(() => {
+      dispatch(setUserInfo(initialState.userInfo));
+      dispatch(setModalOpen(false));
+    });
   };
 
   return (
@@ -81,51 +82,29 @@ function Signup({ setIsSignUp }: signUpProp) {
       >
         <ModalContent>
           <CenterContent>
-            <h2>회원가입</h2>
+            <h2>마이페이지</h2>
           </CenterContent>
           <form id="formData">
             <div>
               <div>아이디</div>
-              <input
-                className="short"
-                name="userId"
-                id="userId"
-                onFocus={() => {
-                  setIsDuplId(false);
-                  setIsSubmit(false);
-                }}
-              ></input>
-              <button
-                onClick={() => {
-                  duplCheck("userId");
-                }}
-              >
-                중복 검사
-              </button>
-              {isDuplId ? <span>사용 가능</span> : <span>사용 불가능</span>}
+              <div>{userInfo.userId}</div>
             </div>
             <div>
               <div>닉네임</div>
               <input
                 className="short"
-                name="nickName"
+                name="changeNick"
                 id="nickName"
                 onFocus={() => {
                   setIsDuplNN(false);
                   setIsSubmit(false);
                 }}
               ></input>
-              <button
-                onClick={() => {
-                  duplCheck("nickName");
-                }}
-              >
-                중복 검사
-              </button>
+              <button onClick={duplCheck}>중복 검사</button>
               {isDuplNN ? <span>사용 가능</span> : <span>사용 불가능</span>}
             </div>
             <div>
-              <div>비밀번호</div>
+              <div>비밀번호 변경</div>
               <input name="password" type="password" id="password"></input>
             </div>
             <div>
@@ -146,33 +125,50 @@ function Signup({ setIsSignUp }: signUpProp) {
           <CenterContent>
             {isSubmit ? <div>중복 검사를 해주세요</div> : null}
             <div className="ttal">
-              {isDuplId && isDuplNN ? (
-                <button onClick={signupHandler}>가입하기</button>
+              {isDuplNN ? (
+                <button onClick={updateHandler}>정보수정</button>
               ) : (
                 <button
                   onClick={() => {
-                    setIsSubmit(true);
+                    const nick = document.getElementById(
+                      "nickName"
+                    ) as HTMLInputElement;
+
+                    if (nick.value) {
+                      setIsSubmit(true);
+                    } else {
+                      updateHandler();
+                    }
                   }}
                 >
-                  가입하기
+                  정보수정
                 </button>
               )}
               <button
                 onClick={() => {
-                  setIsSignUp(false);
+                  setIsSignout(true);
                 }}
               >
-                뒤로가기
+                회원탈퇴
               </button>
             </div>
           </CenterContent>
+          {isSignout ? (
+            <CenterContent>
+              <div>모든 정보가 삭제됩니다</div>
+              <div>정말 탈퇴하시겠습니까?</div>
+              <div>
+                <button onClick={signoutHandler}>예</button>
+              </div>
+            </CenterContent>
+          ) : null}
         </ModalContent>
       </ModalWrapper>
     </Background>
   );
 }
 
-export default Signup;
+export default InfoUpdate;
 
 const Background = styled.div`
   width: 100%;

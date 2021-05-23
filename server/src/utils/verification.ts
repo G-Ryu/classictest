@@ -7,7 +7,9 @@ import("dotenv/config");
 
 export = async (req, res, next) => {
   try {
+    console.log("쿠키", req.cookies, req.cookies.refreshToken);
     if (req.cookies && req.cookies.refreshToken) {
+      console.log("리프레시");
       const refreshToken = await getRepository(Refresh)
         .createQueryBuilder("refresh")
         .where("refresh.hashedIdx = :hashedIdx", {
@@ -39,18 +41,14 @@ export = async (req, res, next) => {
     } else if (req.headers.authorization) {
       const accessToken = req.headers.authorization.slice(7);
 
-      jwt.verify(
-        accessToken,
-        process.env.SHA_AT,
-        (err, decoded: decodedAT) => {
-          if (err || decoded.exp - decoded.iat < 600) {
-            res.status(401).send({ message: "token expired" });
-          } else {
-            req.nickName = decoded.nickName;
-            next();
-          }
+      jwt.verify(accessToken, process.env.SHA_AT, (err, decoded: decodedAT) => {
+        if (err || decoded.exp - decoded.iat < 600) {
+          res.status(401).send({ message: "token expired" });
+        } else {
+          req.nickName = decoded.nickName;
+          next();
         }
-      );
+      });
     } else {
       next();
     }

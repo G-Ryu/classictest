@@ -1,12 +1,20 @@
 export interface userInfo {
-  id: string;
+  userId: string;
   nickName: string;
-  profileIMG: string;
+  profileImage: string;
+  accessToken: string;
+  isLogin: boolean;
 }
 
 export interface music {
   singer: string;
-  title: string;
+  track: string;
   album: string;
   poster: string;
+  uploader: uploader;
+  id: number;
+}
+
+interface uploader {
+  nickName: string;
 }

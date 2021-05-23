@@ -5,6 +5,8 @@ export = async (req, res) => {
   try {
     const music = await getRepository(Music)
       .createQueryBuilder("music")
+      .select(["music", "user.nickName"])
+      .leftJoin("music.uploader", "user")
       .getMany();
 
     res.send({ data: music });

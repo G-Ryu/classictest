@@ -4,8 +4,6 @@ import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { setModalOpen, setUserInfo } from "../actions";
 import Signup from "./Signup";
-import dotenv from "dotenv";
-dotenv.config();
 
 function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -23,10 +21,12 @@ function Login() {
         userId: id.value,
         password: pw.value,
       },
+      withCredentials: true,
     })
       .then((res) => {
-        const userInfo = Object.assign({ isLogin: true }, res.data);
+        const userInfo = Object.assign({ isLogin: true }, res.data.data);
         dispatch(setUserInfo(userInfo));
+        dispatch(setModalOpen(false));
       })
       .catch(() => {
         setIsErr(true);
@@ -69,6 +69,7 @@ function Login() {
           </div>
 
           <div className="ttal">
+            <button onClick={loginHandler}>로그인</button>
             <button
               onClick={() => {
                 setIsSignUp(true);
@@ -76,7 +77,6 @@ function Login() {
             >
               회원가입
             </button>
-            <button onClick={loginHandler}>로그인</button>
           </div>
           {isErr ? <div>아이디와 비밀번호를 확인해주세요</div> : null}
         </ModalContent>

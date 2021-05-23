@@ -7,7 +7,7 @@ import("dotenv/config");
 
 export = async (req, res) => {
   const { userId, password } = req.body;
-  console.log(req.body);
+
   try {
     const hashPW = crypto
       .createHmac("sha256", process.env.SHA_PW)
@@ -43,7 +43,7 @@ export = async (req, res) => {
     }
 
     const accessToken = jwt.sign({ nickName }, process.env.SHA_AT, {
-      expiresIn: 3600,
+      expiresIn: 10,
     });
 
     const refreshToken = jwt.sign({ id: userData.id }, process.env.SHA_RT, {
@@ -76,6 +76,7 @@ export = async (req, res) => {
       })
       .send({
         data: {
+          userId,
           nickName,
           profileImage,
           accessToken,

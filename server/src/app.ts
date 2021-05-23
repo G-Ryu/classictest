@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { createConnection } from "typeorm";
 import "reflect-metadata";
 import dbconfig from "./config";
@@ -17,11 +18,12 @@ createConnection(dbconfig)
   .catch((error) => console.log(error));
 
 app.use(morgan("dev"));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://localhost:3000",
     credentials: true,
   })
 );

@@ -23,7 +23,7 @@ export = async (req, res) => {
     music.album = album;
     music.uploader = user;
     music.filePath = req.files["filePath"][0].location;
-    if (req.file["poster"]) {
+    if (req.files["poster"]) {
       music.poster = req.files["poster"][0].location;
     } else {
       music.poster =
@@ -32,7 +32,7 @@ export = async (req, res) => {
 
     await music.save();
 
-    res.send({ message: "create" });
+    res.send({ data: music });
   } catch (err) {
     console.log("music-create\n", err);
     res.status(400).send({ message: "something wrong" });

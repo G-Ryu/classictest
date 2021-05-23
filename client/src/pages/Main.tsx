@@ -1,26 +1,48 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Music from "../components/Music";
+import Create from "../components/Create";
 import { music } from "../types";
+import { RootState } from "../store/index";
 
 function Main() {
-  const [data, setData] = useState<music[] | null>([]);
+  const [data, setData] = useState<music[] | null>(null);
+  const [isCreate, setIsCreate] = useState(false);
+
+  const userInfo = useSelector(
+    (state: RootState) => state.userInfoReducer.userInfo
+  );
 
   useEffect(() => {
-    //서버에서 데이터 받아오기
+    axios({
+      url: `${process.env.REACT_APP_SERVER}/music/read`,
+    }).then((res) => {
+      setData(res.data.data);
+    });
   }, []);
 
   return (
     <div>
-      <h2>Main</h2>
-      <img
-        src={
-          "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1500&q=80"
-        }
-        width="100px"
-      />
-      {data ? <Music data={data} /> : null}
+      <h2>음악 목록</h2>
+      {userInfo.isLogin ? (
+        !isCreate ? (
+          <div>
+            <button
+              onClick={() => {
+                setIsCreate(true);
+              }}
+            >
+              음악 등록
+            </button>
+          </div>
+        ) : null
+      ) : null}
+      {isCreate ? (
+        <Create setIsCreate={setIsCreate} data={data} setData={setData} />
+      ) : null}
+
+      {data ? <Music data={data} setData={setData}/> : null}
     </div>
   );
 }

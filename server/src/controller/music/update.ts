@@ -14,22 +14,24 @@ export = async (req, res) => {
   try {
     const music = await getRepository(Music)
       .createQueryBuilder("music")
+      .select(["music", "user.nickName"])
+      .leftJoin("music.uploader", "user")
       .where("music.id = :id", { id: musicId })
       .getOne();
 
-    music.singer = singer;
-    music.track = track;
-    music.album = album;
-    if (req.file["filePath"]) {
+    singer ? (music.singer = singer) : null;
+    track ? (music.track = track) : null;
+    album ? (music.album = album) : null;
+    if (req.files["filePath"]) {
       music.filePath = req.files["filePath"][0].location;
     }
-    if (req.file["poster"]) {
+    if (req.files["poster"]) {
       music.poster = req.files["poster"][0].location;
     }
 
     await music.save();
-
-    res.send({ message: "update" });
+    console.log(music);
+    res.send({ data: music });
   } catch (err) {
     console.log("music-update\n", err);
     res.status(400).send({ message: "something wrong" });
