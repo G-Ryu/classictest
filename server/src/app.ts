@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: "https://onlygryu.shop",
+    origin: ["https://onlygryu.shop", "https://localhost:3000"],
     credentials: true,
   })
 );

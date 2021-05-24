@@ -24,7 +24,7 @@ app.use(cookie_parser_1.default());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(cors_1.default({
-    origin: "https://onlygryu.shop",
+    origin: ["https://onlygryu.shop", "https://localhost:3000"],
     credentials: true,
 }));
 app.use(verification_1.default);

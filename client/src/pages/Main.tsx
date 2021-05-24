@@ -42,7 +42,15 @@ function Main() {
         <Create setIsCreate={setIsCreate} data={data} setData={setData} />
       ) : null}
 
-      {data ? <Music data={data} setData={setData} /> : null}
+      {data ? (
+        data.map((music, idx) => {
+          return (
+            <Music key={idx} data={data} music={music} setData={setData} />
+          );
+        })
+      ) : (
+        <div>로딩 중</div>
+      )}
     </div>
   );
 }

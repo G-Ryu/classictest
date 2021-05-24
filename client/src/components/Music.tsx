@@ -10,10 +10,11 @@ import initialState from "../reducers/initialState";
 
 interface props {
   data: music[];
+  music: music;
   setData: React.Dispatch<React.SetStateAction<music[] | null>>;
 }
 
-function Music({ data, setData }: props) {
+function Music({ data, music, setData }: props) {
   const [isUpdate, setIsUpdate] = useState(false);
   const dispatch = useDispatch();
   const userInfo = useSelector(
@@ -43,59 +44,51 @@ function Music({ data, setData }: props) {
       });
   };
 
-  return data.length === 0 ? (
-    <div>등록된 음악이 없습니다</div>
-  ) : (
+  return (
     <div>
-      {data.map((music, idx) => {
-        return (
-          <div key={idx}>
-            <FloatBox>
-              <ImageBox>
-                <img src={music.poster} width="100px" height="100px" />
-              </ImageBox>
-              <TextBox>
-                <div>음악가 {music.singer}</div>
-                <div>트랙명 {music.track}</div>
-                <div>앨범명 {music.album}</div>
-                <audio controls>
-                  <source src={music.filePath}></source>
-                </audio>
-              </TextBox>
-              <ButtonBox>
-                {music.uploader.userId === userInfo.userId ? (
-                  <>
-                    <button
-                      onClick={() => {
-                        setIsUpdate(true);
-                      }}
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => {
-                        deleteHandler(music.id);
-                      }}
-                    >
-                      삭제
-                    </button>
-                  </>
-                ) : null}
-              </ButtonBox>
-            </FloatBox>
-            <div>
-              {isUpdate ? (
-                <MusicUpdate
-                  setIsUpdate={setIsUpdate}
-                  target={music}
-                  data={data}
-                  setData={setData}
-                />
-              ) : null}
-            </div>
-          </div>
-        );
-      })}
+      <FloatBox>
+        <ImageBox>
+          <img src={music.poster} width="100px" height="100px" />
+        </ImageBox>
+        <TextBox>
+          <div>음악가 {music.singer}</div>
+          <div>트랙명 {music.track}</div>
+          <div>앨범명 {music.album}</div>
+          <audio controls>
+            <source src={music.filePath}></source>
+          </audio>
+        </TextBox>
+        <ButtonBox>
+          {music.uploader.userId === userInfo.userId ? (
+            <>
+              <button
+                onClick={() => {
+                  setIsUpdate(true);
+                }}
+              >
+                수정
+              </button>
+              <button
+                onClick={() => {
+                  deleteHandler(music.id);
+                }}
+              >
+                삭제
+              </button>
+            </>
+          ) : null}
+        </ButtonBox>
+      </FloatBox>
+      <div>
+        {isUpdate ? (
+          <MusicUpdate
+            setIsUpdate={setIsUpdate}
+            target={music}
+            data={data}
+            setData={setData}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
