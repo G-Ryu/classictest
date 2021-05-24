@@ -1,9 +1,11 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "../store/index";
 import { music } from "../types";
+import initialState from "../reducers/initialState";
+import { setUserInfo } from "../actions";
 
 interface props {
   setIsUpdate: React.Dispatch<React.SetStateAction<boolean>>;
@@ -13,6 +15,7 @@ interface props {
 }
 
 function MusicUpdate({ setIsUpdate, target, data, setData }: props) {
+  const dispatch = useDispatch();
   const userInfo = useSelector(
     (state: RootState) => state.userInfoReducer.userInfo
   );
@@ -29,18 +32,32 @@ function MusicUpdate({ setIsUpdate, target, data, setData }: props) {
         Authorization: `Bearer ${userInfo.accessToken}`,
         "Content-Type": "multipart/form-data",
       },
-    }).then((res) => {
-      if (data) {
-        const cgData = data.map((music) => {
-          if (music.id !== target.id) {
-            return music;
-          } else {
-            return res.data.data;
-          }
-        });
-        setData(cgData);
-      }
-    });
+      withCredentials: true,
+    })
+      .then((res) => {
+        if (data) {
+          const cgData = data.map((music) => {
+            if (music.id !== target.id) {
+              return music;
+            } else {
+              const cgMusic = Object.assign({}, res.data.data, {
+                uploader: {
+                  userId: music.uploader.userId,
+                },
+              });
+              return cgMusic;
+            }
+          });
+          setData(cgData);
+          setIsUpdate(false);
+        }
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 403) {
+          dispatch(setUserInfo(initialState.userInfo));
+          setIsUpdate(false);
+        }
+      });
   };
 
   return (

@@ -2,9 +2,9 @@ import { getRepository } from "typeorm";
 import { User } from "../../entity/User";
 
 export = async (req, res) => {
-  const nickName = req.nickName;
+  const userId = req.userId;
 
-  if (!nickName) {
+  if (!userId) {
     res.status(403).send({ message: "invalid user" });
     return;
   }
@@ -12,7 +12,7 @@ export = async (req, res) => {
   try {
     const user = await getRepository(User)
       .createQueryBuilder("user")
-      .where("user.nickName = :nickName", { nickName })
+      .where("user.userId = :userId", { userId })
       .leftJoinAndSelect("user.musics", "music")
       .getOne();
 
@@ -23,6 +23,7 @@ export = async (req, res) => {
         profileImage: user.profileImage,
         upload: user.musics,
       },
+      accessToken: req.accessToken,
     });
   } catch (err) {
     console.log("user-info\n", err);

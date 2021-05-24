@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { setUserInfo } from "../actions";
 import { RootState } from "../store/index";
 import { music } from "../types";
-import { refresh } from "../utils/verification";
 import initialState from "../reducers/initialState";
 
 interface props {
@@ -24,7 +23,6 @@ function Create({ setIsCreate, data, setData }: props) {
 
   const createHandler = async () => {
     const file = document.getElementById("filePath") as HTMLInputElement;
-
     if (!file.value) {
       setIsErr(true);
     } else {
@@ -47,22 +45,20 @@ function Create({ setIsCreate, data, setData }: props) {
           } else {
             setData([res.data.data]);
           }
+
+          if (res.data.accessToken) {
+            const refreshInfo = Object.assign({}, userInfo, {
+              accessToken: res.data.accessToken,
+            });
+            dispatch(setUserInfo(refreshInfo));
+          }
+
           setIsCreate(false);
         })
-        .catch(async (err) => {
-          if (err.response && err.response.status === 401) {
-            const token = await refresh();
-            console.log(token);
-            // if (token) {
-            //   const refreshInfo = Object.assign({}, userInfo, {
-            //     accessToken: token,
-            //   });
-            //   dispatch(setUserInfo(refreshInfo));
-            //   createHandler();
-            // } else {
-            //   dispatch(setUserInfo(initialState.userInfo));
-            //   setIsCreate(false);
-            // }
+        .catch((err) => {
+          if (err.response && err.response.status === 403) {
+            dispatch(setUserInfo(initialState.userInfo));
+            setIsCreate(false);
           }
         });
     }

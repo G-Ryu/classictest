@@ -7,14 +7,15 @@ export interface userInfo {
 }
 
 export interface music {
+  id: number;
   singer: string;
   track: string;
   album: string;
   poster: string;
+  filePath: string;
   uploader: uploader;
-  id: number;
 }
 
 interface uploader {
-  nickName: string;
+  userId: string;
 }

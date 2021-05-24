@@ -3,10 +3,10 @@ import { Music } from "../../entity/Music";
 import { getRepository } from "typeorm";
 
 export = async (req, res) => {
-  const nickName = req.nickName;
+  const userId = req.userId;
   const { singer, track, album } = req.body;
 
-  if (!nickName) {
+  if (!userId) {
     res.status(403).send({ message: "invalid user" });
     return;
   }
@@ -14,7 +14,7 @@ export = async (req, res) => {
   try {
     const user = await getRepository(User)
       .createQueryBuilder("user")
-      .where("user.nickName = :nickName", { nickName })
+      .where("user.userId = :userId", { userId })
       .getOne();
 
     const music = new Music();
@@ -32,7 +32,7 @@ export = async (req, res) => {
 
     await music.save();
 
-    res.send({ data: music });
+    res.send({ data: music, accessToken: req.accessToken });
   } catch (err) {
     console.log("music-create\n", err);
     res.status(400).send({ message: "something wrong" });

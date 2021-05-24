@@ -7,53 +7,68 @@ import("dotenv/config");
 
 export = async (req, res, next) => {
   try {
-    console.log("쿠키", req.cookies, req.cookies.refreshToken);
-    if (req.cookies && req.cookies.refreshToken) {
-      console.log("리프레시");
-      const refreshToken = await getRepository(Refresh)
-        .createQueryBuilder("refresh")
-        .where("refresh.hashedIdx = :hashedIdx", {
-          hashedIdx: req.cookies.refreshToken,
-        })
-        .getOne();
-
-      let userId: number;
-      jwt.verify(
-        refreshToken.token,
-        process.env.SHA_RT,
-        (err, decoded: decodedRT) => {
-          userId = decoded.id;
-        }
-      );
-
-      const user = await getRepository(User)
-        .createQueryBuilder("user")
-        .where("user.id = :id", { id: userId })
-        .getOne();
-
-      const accessToken = jwt.sign(
-        { nickName: user.nickName },
-        process.env.SHA_AT,
-        { expiresIn: 3600 }
-      );
-
-      res.send({ data: { accessToken } });
-    } else if (req.headers.authorization) {
+    if (req.headers.authorization) {
       const accessToken = req.headers.authorization.slice(7);
 
-      jwt.verify(accessToken, process.env.SHA_AT, (err, decoded: decodedAT) => {
-        if (err || decoded.exp - decoded.iat < 600) {
-          res.status(401).send({ message: "token expired" });
-        } else {
-          req.nickName = decoded.nickName;
-          next();
+      jwt.verify(
+        accessToken,
+        process.env.SHA_AT,
+        async (err, decoded: decodedAT) => {
+          if (err || decoded.exp - decoded.iat < 600) {
+            const refreshObj = await refresh(req.cookies.refreshToken);
+            if (!refreshObj) {
+              res.status(403).send({ message: "token expired" });
+            } else {
+              req.userId = refreshObj.userId;
+              req.accessToken = refreshObj.accessToken;
+              next();
+            }
+          } else {
+            req.userId = decoded.userId;
+            next();
+          }
         }
-      });
+      );
     } else {
       next();
     }
   } catch (err) {
     console.log("토큰 검사", err);
     res.status(400).send({ message: "someting wrong" });
+  }
+};
+
+const refresh = async (cookieRT) => {
+  const refreshToken = await getRepository(Refresh)
+    .createQueryBuilder("refresh")
+    .where("refresh.hashedIdx = :hashedIdx", {
+      hashedIdx: cookieRT,
+    })
+    .getOne();
+
+  let userIdx: number;
+  jwt.verify(
+    refreshToken.token,
+    process.env.SHA_RT,
+    (err, decoded: decodedRT) => {
+      if (!err) {
+        userIdx = decoded.id;
+      }
+    }
+  );
+
+  if (userIdx) {
+    const user = await getRepository(User)
+      .createQueryBuilder("user")
+      .where("user.id = :id", { id: userIdx })
+      .getOne();
+
+    const accessToken = jwt.sign({ userId: user.userId }, process.env.SHA_AT, {
+      expiresIn: 3600,
+    });
+
+    return { userId: user.userId, accessToken };
+  } else {
+    return false;
   }
 };

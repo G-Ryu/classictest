@@ -3,7 +3,7 @@ export interface decodedRT {
 }
 
 export interface decodedAT {
-  nickName: string;
+  userId: string;
   exp: number;
   iat: number;
 }

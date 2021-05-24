@@ -42,7 +42,7 @@ function Main() {
         <Create setIsCreate={setIsCreate} data={data} setData={setData} />
       ) : null}
 
-      {data ? <Music data={data} setData={setData}/> : null}
+      {data ? <Music data={data} setData={setData} /> : null}
     </div>
   );
 }

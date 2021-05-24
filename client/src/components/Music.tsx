@@ -1,10 +1,12 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { setUserInfo } from "../actions";
 import { RootState } from "../store/index";
 import { music } from "../types";
 import MusicUpdate from "./MusicUpdate";
+import initialState from "../reducers/initialState";
 
 interface props {
   data: music[];
@@ -13,6 +15,7 @@ interface props {
 
 function Music({ data, setData }: props) {
   const [isUpdate, setIsUpdate] = useState(false);
+  const dispatch = useDispatch();
   const userInfo = useSelector(
     (state: RootState) => state.userInfoReducer.userInfo
   );
@@ -27,10 +30,17 @@ function Music({ data, setData }: props) {
       params: {
         musicId,
       },
-    }).then(() => {
-      const cgData = data.filter((music) => music.id !== musicId);
-      setData(cgData);
-    });
+      withCredentials: true,
+    })
+      .then(() => {
+        const cgData = data.filter((music) => music.id !== musicId);
+        setData(cgData);
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 403) {
+          dispatch(setUserInfo(initialState.userInfo));
+        }
+      });
   };
 
   return data.length === 0 ? (
@@ -48,9 +58,12 @@ function Music({ data, setData }: props) {
                 <div>음악가 {music.singer}</div>
                 <div>트랙명 {music.track}</div>
                 <div>앨범명 {music.album}</div>
+                <audio controls>
+                  <source src={music.filePath}></source>
+                </audio>
               </TextBox>
               <ButtonBox>
-                {music.uploader.nickName === userInfo.nickName ? (
+                {music.uploader.userId === userInfo.userId ? (
                   <>
                     <button
                       onClick={() => {

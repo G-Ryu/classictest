@@ -27,15 +27,27 @@ function InfoUpdate() {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${userInfo.accessToken}`,
       },
+      withCredentials: true,
       data: form,
-    }).then((res) => {
-      const nickName = res.data.data.nickName;
-      const profileImage = res.data.data.profileImage;
-      const cgIF = Object.assign({}, userInfo, { nickName, profileImage });
+    })
+      .then((res) => {
+        const nickName = res.data.data.nickName;
+        const profileImage = res.data.data.profileImage;
+        const cgIF = Object.assign({}, userInfo, { nickName, profileImage });
 
-      dispatch(setUserInfo(cgIF));
-      dispatch(setModalOpen(false));
-    });
+        if (res.data.accessToken) {
+          cgIF["accessToken"] = res.data.accessToken;
+        }
+
+        dispatch(setUserInfo(cgIF));
+        dispatch(setModalOpen(false));
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 403) {
+          dispatch(setUserInfo(initialState.userInfo));
+          dispatch(setModalOpen(false));
+        }
+      });
   };
 
   const duplCheck = async () => {
@@ -63,10 +75,18 @@ function InfoUpdate() {
       headers: {
         Authorization: `Bearer ${userInfo.accessToken}`,
       },
-    }).then(() => {
-      dispatch(setUserInfo(initialState.userInfo));
-      dispatch(setModalOpen(false));
-    });
+      withCredentials: true,
+    })
+      .then(() => {
+        dispatch(setUserInfo(initialState.userInfo));
+        dispatch(setModalOpen(false));
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 403) {
+          dispatch(setUserInfo(initialState.userInfo));
+          dispatch(setModalOpen(false));
+        }
+      });
   };
 
   return (
@@ -93,7 +113,7 @@ function InfoUpdate() {
               <div>닉네임</div>
               <input
                 className="short"
-                name="changeNick"
+                name="nickName"
                 id="nickName"
                 onFocus={() => {
                   setIsDuplNN(false);

@@ -21,6 +21,7 @@ function Mypage() {
       headers: {
         Authorization: `Bearer ${userInfo.accessToken}`,
       },
+      withCredentials: true,
     }).then(() => {
       dispatch(setUserInfo(initialState.userInfo));
       dispatch(setModalOpen(false));

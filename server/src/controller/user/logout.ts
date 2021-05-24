@@ -1,7 +1,7 @@
 export = (req, res) => {
-  const nickName = req.nickName;
+  const userId = req.userId;
 
-  if (!nickName) {
+  if (!userId) {
     res.status(403).send({ message: "invalid user" });
     return;
   }

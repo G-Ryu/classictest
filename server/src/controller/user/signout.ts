@@ -3,9 +3,9 @@ import { User } from "../../entity/User";
 import("dotenv/config");
 
 export = async (req, res) => {
-  const nickName = req.nickName;
+  const userId = req.userId;
 
-  if (!nickName) {
+  if (!userId) {
     res.status(403).send({ message: "invalid user" });
     return;
   }
@@ -15,7 +15,7 @@ export = async (req, res) => {
       .createQueryBuilder()
       .delete()
       .from(User)
-      .where("nickName = :nickName", { nickName })
+      .where("userId = :userId", { userId })
       .execute();
 
     res

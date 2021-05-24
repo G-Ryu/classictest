@@ -42,8 +42,8 @@ export = async (req, res) => {
         .getOne();
     }
 
-    const accessToken = jwt.sign({ nickName }, process.env.SHA_AT, {
-      expiresIn: 10,
+    const accessToken = jwt.sign({ userId }, process.env.SHA_AT, {
+      expiresIn: 3600,
     });
 
     const refreshToken = jwt.sign({ id: userData.id }, process.env.SHA_RT, {

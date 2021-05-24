@@ -4,10 +4,10 @@ import { getRepository } from "typeorm";
 import("dotenv/config");
 
 export = async (req, res) => {
-  const nickName = req.nickName;
-  const { changeNick, password } = req.body;
+  const userId = req.userId;
+  const { nickName, password } = req.body;
 
-  if (!nickName) {
+  if (!userId) {
     res.status(403).send({ message: "invalid user" });
     return;
   }
@@ -22,11 +22,10 @@ export = async (req, res) => {
 
     const user = await getRepository(User)
       .createQueryBuilder("user")
-      .where("user.nickName = :nickName", { nickName })
-      .leftJoinAndSelect("user.musics", "music")
+      .where("user.userId = :userId", { userId })
       .getOne();
 
-    user.nickName = changeNick || user.nickName;
+    user.nickName = nickName || user.nickName;
     user.password = hashPW || user.password;
     if (req.file) {
       user.profileImage = req.file.location;
@@ -35,6 +34,7 @@ export = async (req, res) => {
 
     res.send({
       data: { nickName: user.nickName, profileImage: user.profileImage },
+      accessToken: req.accessToken,
     });
   } catch (err) {
     console.log("user-update\n", err);
