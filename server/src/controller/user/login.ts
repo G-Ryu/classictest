@@ -68,7 +68,7 @@ export = async (req, res) => {
 
     res
       .cookie("refreshToken", hashedIdx, {
-        domain: "localhost",
+        domain: "onlygryu.shop",
         path: "/",
         sameSite: "none",
         httpOnly: true,

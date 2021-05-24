@@ -132,7 +132,7 @@ module.exports = function (req, res) { return __awaiter(void 0, void 0, void 0, 
             case 9:
                 res
                     .cookie("refreshToken", hashedIdx, {
-                    domain: "localhost",
+                    domain: "onlygryu.shop",
                     path: "/",
                     sameSite: "none",
                     httpOnly: true,

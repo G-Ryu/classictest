@@ -20,7 +20,7 @@ export = async (req, res) => {
 
     res
       .clearCookie("refreshToken", {
-        domain: "localhost",
+        domain: "onlygryu.shop",
         path: "/",
         sameSite: "none",
         httpOnly: true,
