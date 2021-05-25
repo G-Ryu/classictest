@@ -50,7 +50,7 @@ function MusicUpdate({ setIsUpdate, target, data, setData }: props) {
           });
           setData(cgData);
           setIsUpdate(false);
-          window.location.reload()
+          window.location.reload();
         }
       })
       .catch((err) => {

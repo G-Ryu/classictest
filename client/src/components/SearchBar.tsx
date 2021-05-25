@@ -22,7 +22,6 @@ function SearchBar({ setData }: props) {
       },
     }).then((res) => {
       setData(res.data.data);
-      window.location.reload();
     });
   };
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { setUserInfo } from "../actions";
@@ -54,9 +54,7 @@ function Music({ data, music, setData }: props) {
           <div>음악가 {music.singer}</div>
           <div>트랙명 {music.track}</div>
           <div>앨범명 {music.album}</div>
-          <audio controls>
-            <source src={music.filePath}></source>
-          </audio>
+          <audio controls src={music.filePath} />
         </TextBox>
         <ButtonBox>
           {music.uploader.userId === userInfo.userId ? (
