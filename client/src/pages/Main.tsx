@@ -5,6 +5,7 @@ import Music from "../components/Music";
 import Create from "../components/Create";
 import { music } from "../types";
 import { RootState } from "../store/index";
+import SearchBar from "../components/SearchBar";
 
 function Main() {
   const [data, setData] = useState<music[] | null>(null);
@@ -25,6 +26,7 @@ function Main() {
   return (
     <div>
       <h2>음악 목록</h2>
+      <SearchBar setData={setData}/>
       {userInfo.isLogin ? (
         !isCreate ? (
           <div>

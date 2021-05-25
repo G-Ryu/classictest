@@ -16,5 +16,6 @@ router.patch("/update", multer_1.default.fields([
     { name: "poster", maxCount: 1 },
 ]), controller_1.musicController.update);
 router.delete("/delete", controller_1.musicController.delete);
+router.get("/search", controller_1.musicController.search);
 module.exports = router;
 //# sourceMappingURL=music.js.map

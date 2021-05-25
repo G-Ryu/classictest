@@ -21,5 +21,6 @@ router.patch(
   musicController.update
 );
 router.delete("/delete", musicController.delete);
+router.get("/search", musicController.search);
 
 export = router;
